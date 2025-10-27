@@ -4,7 +4,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import fetch from "node-fetch";
 import fs from "fs";
-import { config } from "./config.js"; // isi file config.js dengan token bot
+import { config } from "config.js"; // isi file config.js dengan token bot
 
 const bot = new TelegramBot(config.botToken, { polling: true });
 console.log("🤖 BOT TELE-MD AKTIF...");
