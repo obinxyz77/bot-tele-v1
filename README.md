@@ -16,3 +16,4 @@ Bot Telegram multi-fitur menggunakan Node.js
 3. #npm Install
 4. #npm start
 5. langsung muncul BOT TELE-MD AKTIF....
+ ## maklum masih banyak yang gak bisa day1 buat sc soalnya
