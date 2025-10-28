@@ -31,3 +31,12 @@ Klik tombol di bawah untuk menyalin perintah:
 
 Atau bisa langsung ketik manual di terminal:
 git clone https://github.com/obinxyz77/bot-tele-v1.git
+cd bot-tele-v1
+
+ ##2 jalanin scnya
+ <a href="#" onclick="navigator.clipboard.writeText('npm start'); alert('✅ berhasil disalin!');" style="text-decoration:none;">
+  <img src="https://img.shields.io/badge/%F0%9F%93%83%20Salin%20Git%20Clone-blue?style=for-the-badge" alt="Copy perintah">
+</a>
+ bisa juga langsnung di terminal 
+ npm install
+ npm start
