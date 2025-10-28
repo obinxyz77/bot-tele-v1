@@ -11,7 +11,7 @@ Bot Telegram multi-fitur menggunakan Node.js
 - /weather <kota> → Cek cuaca
 
 ## ⚙️ Cara Menjalankan
-1. #https://github.com/obinxyz77/bot-tele-v1.git
+1. git clone https://github.com/obinxyz77/bot-tele-v1.git
 2. masukin token botnya
 3. #npm Install
 4. #npm start
