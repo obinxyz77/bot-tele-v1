@@ -39,6 +39,8 @@ cd bot-tele-v1
   <img src="https://img.shields.io/badge/%F0%9F%93%83%20Salin%20perintah-blue?style=for-the-badge" alt="Copy perintah">
 </a>
 
- bisa juga langsnung di terminal 
+ bisa juga langsnung di terminal:
+ 
  npm install
+ 
  npm start
