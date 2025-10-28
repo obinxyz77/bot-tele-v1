@@ -19,6 +19,7 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
     process.exit(1);
   }
 
+  // === Inisialisasi Bot ===
   const bot = new TelegramBot(token, { polling: true });
   console.log("🤖 BOT TELE-MD AKTIF...");
 
@@ -120,7 +121,7 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
 
     const menuCaption = `
 🤖 *𝗠𝗘𝗡𝗨 𝗨𝗧𝗔𝗠𝗔* 🤖
-   🌸𝕆𝔹𝕀ℕ𝕏𝕐ℤ-V1🌸
+    🌸 𝓛𝓪𝓵𝓪  MD🌸
 ━━━━━━━━━━━━━━━━
 👤 Info User
 📜 Menu Tools
