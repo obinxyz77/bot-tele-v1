@@ -7,7 +7,7 @@ import fetch from "node-fetch";
 import fs from "fs";
 import readline from "readline";
 
-// === INPUT TOKEN MANUAL ===
+// === INPUT TOKEN & OWNER MANUAL ===
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
@@ -19,109 +19,114 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
     process.exit(1);
   }
 
-  // === Inisialisasi Bot ===
-  const bot = new TelegramBot(token, { polling: true });
-  console.log("🤖 BOT TELE-MD AKTIF...");
+  rl.question("Masukkan ID Telegram owner/admin kamu: ", (ownerId) => {
+    if (!ownerId) {
+      console.log("❌ ID Owner tidak boleh kosong!");
+      process.exit(1);
+    }
 
-  // === MENU DATA ===
-  const menuList = {
-    info: `
+    // Simpan config biar gak perlu input ulang
+    fs.writeFileSync("config.json", JSON.stringify({ token, ownerId }, null, 2));
+
+    // === Inisialisasi Bot ===
+    const bot = new TelegramBot(token, { polling: true });
+    console.log("🤖 BOT TELE-MD AKTIF...");
+    console.log(`👑 Owner ID: ${ownerId}`);
+
+    // === MENU DATA ===
+    const menuList = {
+      info: `
 👤 *Menu Info User*
 ━━━━━━━━━━━━━━
 /cekid - Lihat ID Telegram kamu
 /profil - Info nama & username
 /waktu - Tampilkan waktu sekarang
-    `,
-
-    tools: `
+      `,
+      tools: `
 📜 *Menu Tools*
 ━━━━━━━━━━━━━━
 /shortlink [url] - Buat link pendek
 /qrcode [text] - Buat QR Code
 /translate [teks] - Translate bahasa
-    `,
-
-    fun: `
+      `,
+      fun: `
 🎮 *Menu Fun*
 ━━━━━━━━━━━━━━
 /jokes - Kirim lawakan random
 /meme - Kirim meme lucu
 /quote - Quote motivasi harian
-    `,
-
-    admin: `
+      `,
+      admin: `
 🛠️ *Menu Admin*
 ━━━━━━━━━━━━━━
 /ban [id] - Ban user
 /unban [id] - Unban user
 /broadcast [pesan] - Kirim pesan ke semua user
-    `,
-
-    group: `
+      `,
+      group: `
 🧩 *Menu Group*
 ━━━━━━━━━━━━━━
 /welcome - Aktifkan pesan selamat datang
 /bye - Pesan perpisahan grup
 /members - Hitung jumlah member
-    `,
-
-    ai: `
+      `,
+      ai: `
 💬 *Menu AI*
 ━━━━━━━━━━━━━━
 /ask [pertanyaan] - Tanya AI
 /imagine [prompt] - Generate gambar AI
 /chat [teks] - Chat dengan AI
-    `,
-
-    downloader: `
+      `,
+      downloader: `
 📁 *Menu Downloader*
 ━━━━━━━━━━━━━━
 /ytmp4 [url] - Download video YouTube
 /ytmp3 [url] - Download musik YouTube
 /tiktok [url] - Download video TikTok
 /igdl [url] - Download media Instagram
-    `,
-
-    owner: `
+      `,
+      owner: `
 🕹️ *Menu Owner*
 ━━━━━━━━━━━━━━
 /eval [kode] - Jalankan kode JS
 /restart - Restart bot
 /stat - Statistik bot
 /send [id] [pesan] - Kirim pesan manual
-    `,
-  };
-
-  // === MENU UTAMA ===
-  bot.onText(/^\/menu$/, (msg) => {
-    const chatId = msg.chat.id;
-
-    const menuKeyboard = {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: "👤 Info User", callback_data: "menu_info" },
-            { text: "📜 Tools", callback_data: "menu_tools" },
-          ],
-          [
-            { text: "🎮 Fun", callback_data: "menu_fun" },
-            { text: "🛠️ Admin", callback_data: "menu_admin" },
-          ],
-          [
-            { text: "🧩 Group", callback_data: "menu_group" },
-            { text: "💬 AI", callback_data: "menu_ai" },
-          ],
-          [
-            { text: "📁 Downloader", callback_data: "menu_downloader" },
-            { text: "🕹️ Owner", callback_data: "menu_owner" },
-          ],
-        ],
-      },
+/addfit [nama] [kode] - Tambah fitur custom
+      `,
     };
 
-    const menuCaption = `
+    // === MENU UTAMA ===
+    bot.onText(/^\/menu$/, (msg) => {
+      const chatId = msg.chat.id;
+
+      const menuKeyboard = {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: "👤 Info User", callback_data: "menu_info" },
+              { text: "📜 Tools", callback_data: "menu_tools" },
+            ],
+            [
+              { text: "🎮 Fun", callback_data: "menu_fun" },
+              { text: "🛠️ Admin", callback_data: "menu_admin" },
+            ],
+            [
+              { text: "🧩 Group", callback_data: "menu_group" },
+              { text: "💬 AI", callback_data: "menu_ai" },
+            ],
+            [
+              { text: "📁 Downloader", callback_data: "menu_downloader" },
+              { text: "🕹️ Owner", callback_data: "menu_owner" },
+            ],
+          ],
+        },
+      };
+
+      const banner = "https://files.catbox.moe/g3zkit.jpeg";
+      const menuCaption = `
 🤖 *𝗠𝗘𝗡𝗨 𝗨𝗧𝗔𝗠𝗔* 🤖
-    🌸 𝓛𝓪𝓵𝓪  MD🌸
+🌸 𝓛𝓪𝓵𝓪  MD🌸
 ━━━━━━━━━━━━━━━━
 👤 Info User
 📜 Menu Tools
@@ -133,107 +138,114 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
 🕹️ Menu Owner
 ━━━━━━━━━━━━━━━━
 Klik tombol di bawah untuk melihat isinya ↓
-    `;
+      `;
 
-    const banner = "https://files.catbox.moe/g3zkit.jpeg";
-
-    bot.sendPhoto(chatId, banner, {
-      caption: menuCaption,
-      parse_mode: "Markdown",
-      ...menuKeyboard,
+      bot.sendPhoto(chatId, banner, {
+        caption: menuCaption,
+        parse_mode: "Markdown",
+        ...menuKeyboard,
+      });
     });
-  });
 
-  // === Saat tombol ditekan ===
-  bot.on("callback_query", (query) => {
-    const chatId = query.message.chat.id;
-    const data = query.data;
+    // === Callback Menu ===
+    bot.on("callback_query", (query) => {
+      const chatId = query.message.chat.id;
+      const data = query.data;
 
-    if (data.startsWith("menu_")) {
-      const menuName = data.split("_")[1];
-      const menuContent = menuList[menuName];
-
-      if (menuContent) {
-        bot.sendMessage(chatId, menuContent, { parse_mode: "Markdown" });
-      } else {
-        bot.sendMessage(chatId, "❌ Menu tidak ditemukan.");
+      if (data.startsWith("menu_")) {
+        const menuName = data.split("_")[1];
+        const menuContent = menuList[menuName];
+        bot.sendMessage(chatId, menuContent || "❌ Menu tidak ditemukan.", {
+          parse_mode: "Markdown",
+        });
       }
-    }
+      bot.answerCallbackQuery(query.id);
+    });
 
-    bot.answerCallbackQuery(query.id);
-  });
+    // === Cek ID ===
+    bot.onText(/^\/cekid$/, (msg) => {
+      bot.sendMessage(
+        msg.chat.id,
+        `🆔 ID Kamu: \`${msg.from.id}\`\n👤 Nama: ${msg.from.first_name}`,
+        { parse_mode: "Markdown" }
+      );
+    });
 
-  // === Fitur Cek ID ===
-  bot.onText(/^\/cekid$/, (msg) => {
-    bot.sendMessage(
-      msg.chat.id,
-      `🆔 ID Kamu: \`${msg.from.id}\`\n👤 Nama: ${msg.from.first_name}`,
-      { parse_mode: "Markdown" }
-    );
-  });
-
-  // === Fitur TikTok Downloader ===
-  bot.onText(/^\/tiktok (.+)/, async (msg, match) => {
-    const chatId = msg.chat.id;
-    const url = match[1];
-    bot.sendMessage(chatId, "📥 Mengambil video TikTok tanpa watermark...");
-    try {
-      const api = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
-      const res = await fetch(api);
-      const j = await res.json();
-      if (j && j.data && j.data.play) {
-        const videoUrl = j.data.play;
-        await bot.sendVideo(chatId, videoUrl, { caption: `🎬 ${j.data.title}` });
-      } else {
-        throw new Error("Data tidak valid");
+    // === Tambah Fitur Dinamis ===
+    bot.onText(/^\/addfit (.+)/, (msg, match) => {
+      if (msg.from.id.toString() !== ownerId.toString()) {
+        return bot.sendMessage(msg.chat.id, "❌ Kamu bukan owner!");
       }
-    } catch (e) {
-      console.error(e);
-      bot.sendMessage(chatId, "❌ Gagal mengambil video TikTok.");
-    }
-  });
 
-  // === Fitur Instagram Downloader ===
-  bot.onText(/^\/igdl (.+)/, async (msg, match) => {
-    const chatId = msg.chat.id;
-    const url = match[1];
-    bot.sendMessage(chatId, "📥 Mengambil media Instagram...");
-    try {
-      const api = `https://api.sssinstagram.com/api/ig?url=${encodeURIComponent(url)}`;
-      const res = await fetch(api);
-      const j = await res.json();
-      if (j && j.links && j.links.length > 0) {
-        for (const media of j.links) {
-          await bot.sendVideo(chatId, media.url, { caption: "🎬 Media Instagram" });
-        }
-      } else throw new Error("Tidak ada media.");
-    } catch (e) {
-      console.error(e);
-      bot.sendMessage(chatId, "❌ Gagal mengambil media Instagram.");
-    }
-  });
+      const args = match[1].split(" ");
+      const nama = args.shift();
+      const kode = args.join(" ");
 
-  // === Fitur Sticker Maker ===
-  bot.on("photo", async (msg) => {
-    const chatId = msg.chat.id;
-    const fileId = msg.photo.pop().file_id;
-    const fileLink = await bot.getFileLink(fileId);
-    const res = await fetch(fileLink);
-    const buffer = Buffer.from(await res.arrayBuffer());
+      if (!nama || !kode)
+        return bot.sendMessage(msg.chat.id, "❌ Format: /addfit [nama] [kode JS]");
 
-    fs.writeFileSync("temp.jpg", buffer);
-    await bot.sendSticker(chatId, "temp.jpg");
-    fs.unlinkSync("temp.jpg");
-  });
+      try {
+        eval(`bot.onText(/^\\/${nama}$/, async (msg) => { ${kode} })`);
+        bot.sendMessage(msg.chat.id, `✅ Fitur baru '/${nama}' berhasil ditambahkan!`);
+      } catch (err) {
+        bot.sendMessage(msg.chat.id, `❌ Gagal menambah fitur: ${err.message}`);
+      }
+    });
 
-  // === Respon sederhana ===
-  bot.on("message", (msg) => {
-    const text = msg.text?.toLowerCase();
-    const chatId = msg.chat.id;
-    if (!text) return;
+    // === TikTok Downloader ===
+    bot.onText(/^\/tiktok (.+)/, async (msg, match) => {
+      const chatId = msg.chat.id;
+      const url = match[1];
+      bot.sendMessage(chatId, "📥 Mengambil video TikTok...");
+      try {
+        const api = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+        const res = await fetch(api);
+        const j = await res.json();
+        if (j?.data?.play) {
+          await bot.sendVideo(chatId, j.data.play, { caption: `🎬 ${j.data.title}` });
+        } else throw new Error("Data tidak valid");
+      } catch {
+        bot.sendMessage(chatId, "❌ Gagal mengambil video TikTok.");
+      }
+    });
 
-    if (["halo", "hai", "hi"].includes(text)) {
-      bot.sendMessage(chatId, `Halo ${msg.from.first_name}! 👋\nKetik /menu untuk melihat semua fitur.`);
-    }
+    // === IG Downloader ===
+    bot.onText(/^\/igdl (.+)/, async (msg, match) => {
+      const chatId = msg.chat.id;
+      const url = match[1];
+      bot.sendMessage(chatId, "📥 Mengambil media Instagram...");
+      try {
+        const api = `https://api.sssinstagram.com/api/ig?url=${encodeURIComponent(url)}`;
+        const res = await fetch(api);
+        const j = await res.json();
+        if (j?.links?.length) {
+          for (const media of j.links)
+            await bot.sendVideo(chatId, media.url, { caption: "🎬 Media Instagram" });
+        } else throw new Error("Tidak ada media");
+      } catch {
+        bot.sendMessage(chatId, "❌ Gagal mengambil media Instagram.");
+      }
+    });
+
+    // === Sticker Maker ===
+    bot.on("photo", async (msg) => {
+      const chatId = msg.chat.id;
+      const fileId = msg.photo.pop().file_id;
+      const fileLink = await bot.getFileLink(fileId);
+      const res = await fetch(fileLink);
+      const buffer = Buffer.from(await res.arrayBuffer());
+      fs.writeFileSync("temp.jpg", buffer);
+      await bot.sendSticker(chatId, "temp.jpg");
+      fs.unlinkSync("temp.jpg");
+    });
+
+    // === Respon sederhana ===
+    bot.on("message", (msg) => {
+      const text = msg.text?.toLowerCase();
+      if (!text) return;
+      if (["halo", "hai", "hi"].includes(text)) {
+        bot.sendMessage(msg.chat.id, `Halo ${msg.from.first_name}! 👋\nKetik /menu untuk lihat fitur.`);
+      }
+    });
   });
 });
