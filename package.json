@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node OBINxLALA.js"
   },
   "dependencies": {
     "node-fetch": "^3.3.2",
