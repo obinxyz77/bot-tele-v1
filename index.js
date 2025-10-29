@@ -173,24 +173,42 @@ Klik tombol di bawah untuk melihat isinya ↓
 
     // === Tambah Fitur Dinamis ===
     bot.onText(/^\/addfit (.+)/, (msg, match) => {
-      if (msg.from.id.toString() !== ownerId.toString()) {
-        return bot.sendMessage(msg.chat.id, "❌ Kamu bukan owner!");
-      }
+  if (msg.from.id.toString() !== ownerId.toString()) {
+    return bot.sendMessage(msg.chat.id, "❌ Kamu bukan owner!");
+  }
 
-      const args = match[1].split(" ");
-      const nama = args.shift();
-      const kode = args.join(" ");
+  const args = match[1].trim().split(" ");
+  const nama = args.shift();
+  const kode = args.join(" ");
 
-      if (!nama || !kode)
-        return bot.sendMessage(msg.chat.id, "❌ Format: /addfit [nama] [kode JS]");
+  if (!nama || !kode) {
+    return bot.sendMessage(msg.chat.id, "❌ Format: /addfit [nama] [kode JS]");
+  }
 
+  try {
+    // Escape karakter khusus biar aman di regex
+    const safeName = nama.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    // Buat regex command secara dinamis
+    const regex = new RegExp(`^${safeName}$`, "i");
+
+    // Pasang handler baru
+    bot.onText(regex, async (msg) => {
       try {
-        eval(`bot.onText(/^\\/${nama}$/, async (msg) => { ${kode} })`);
-        bot.sendMessage(msg.chat.id, `✅ Fitur baru '/${nama}' berhasil ditambahkan!`);
-      } catch (err) {
-        bot.sendMessage(msg.chat.id, `❌ Gagal menambah fitur: ${err.message}`);
+        eval(kode);
+      } catch (e) {
+        bot.sendMessage(msg.chat.id, `❌ Error di kode fitur: ${e.message}`);
       }
     });
+
+    bot.sendMessage(
+      msg.chat.id,
+      `✅ Fitur baru '${nama}' berhasil ditambahkan!\n\nGunakan perintah: ${nama}`
+    );
+  } catch (err) {
+    bot.sendMessage(msg.chat.id, `❌ Gagal menambah fitur: ${err.message}`);
+  }
+});
 
     // === TikTok Downloader ===
     bot.onText(/^\/tiktok (.+)/, async (msg, match) => {
