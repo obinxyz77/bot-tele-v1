@@ -96,56 +96,60 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
       `,
     };
 
-    // === MENU UTAMA ===
-    bot.onText(/^\/menu$/, (msg) => {
-      const chatId = msg.chat.id;
+// === MENU UTAMA ===
+bot.onText(/^\/menu$/, async (msg) => {
+  const chatId = msg.chat.id;
 
-      const menuKeyboard = {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: "👤 Info User", callback_data: "menu_info" },
-              { text: "📜 Tools", callback_data: "menu_tools" },
-            ],
-            [
-              { text: "🎮 Fun", callback_data: "menu_fun" },
-              { text: "🛠️ Admin", callback_data: "menu_admin" },
-            ],
-            [
-              { text: "🧩 Group", callback_data: "menu_group" },
-              { text: "💬 AI", callback_data: "menu_ai" },
-            ],
-            [
-              { text: "📁 Downloader", callback_data: "menu_downloader" },
-              { text: "🕹️ Owner", callback_data: "menu_owner" },
-            ],
-          ],
-        },
-      };
+  const banner = "https://files.catbox.moe/g3zkit.jpeg";
 
-      const banner = "https://files.catbox.moe/g3zkit.jpeg";
-      const menuCaption = `
-🤖 *𝗠𝗘𝗡𝗨 𝗨𝗧𝗔𝗠𝗔* 🤖
-🌸 𝓛𝓪𝓵𝓪  MD🌸
-━━━━━━━━━━━━━━━━
-👤 Info User
-📜 Menu Tools
-🎮 Menu Fun
-🛠️ Menu Admin
-🧩 Menu Group
-💬 Menu AI
-📁 Menu Downloader
-🕹️ Menu Owner
-━━━━━━━━━━━━━━━━
-Klik tombol di bawah untuk melihat isinya ↓
-      `;
+  const menuCaption = `
+📸 *MENU UTAMA* 📸
+🌸 𝓛𝓪𝓵𝓪 MD 🌸
+──────────────────────────────
+👤 Info User  
+📜 Menu Tools  
+🎮 Menu Fun  
+🛠️ Menu Admin  
+🧩 Menu Group  
+💬 Menu AI  
+📁 Menu Downloader  
+🕹️ Menu Owner  
+──────────────────────────────
+Klik tombol di bawah untuk melihat isinya ⬇️
+  `;
 
-      bot.sendPhoto(chatId, banner, {
-        caption: menuCaption,
-        parse_mode: "Markdown",
-        ...menuKeyboard,
-      });
-    });
+  const menuKeyboard = {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "👤 Info User", callback_data: "menu_info" },
+          { text: "📜 Tools", callback_data: "menu_tools" },
+        ],
+        [
+          { text: "🎮 Fun", callback_data: "menu_fun" },
+          { text: "🛠️ Admin", callback_data: "menu_admin" },
+        ],
+        [
+          { text: "🧩 Group", callback_data: "menu_group" },
+          { text: "💬 AI", callback_data: "menu_ai" },
+        ],
+        [
+          { text: "📁 Downloader", callback_data: "menu_downloader" },
+          { text: "🕹️ Owner", callback_data: "menu_owner" },
+        ],
+        [
+          { text: "📋 Info Bot", callback_data: "menu_info_bot" }
+        ]
+      ],
+    },
+  };
+
+  await bot.sendPhoto(chatId, banner, {
+    caption: menuCaption,
+    parse_mode: "Markdown",
+    reply_markup: menuKeyboard.reply_markup,
+  });
+});
 
     // === Callback Menu ===
     bot.on("callback_query", (query) => {
