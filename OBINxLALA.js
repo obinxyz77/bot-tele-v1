@@ -39,65 +39,65 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
 👤 *Menu Info User*
 ━━━━━━━━━━━━━━
 /cekid - Lihat ID Telegram kamu
-/profil - Info nama & username
-/waktu - Tampilkan waktu sekarang
+/profil - Info nama & username❌️
+/waktu - Tampilkan waktu sekarang❌️
       `,
       tools: `
 📜 *Menu Tools*
 ━━━━━━━━━━━━━━
-/shortlink [url] - Buat link pendek
-/qrcode [text] - Buat QR Code
-/translate [teks] - Translate bahasa
+/shortlink [url] - Buat link pendek❌️
+/qrcode [text] - Buat QR Code❌️
+/translate [teks] - Translate bahasa❌️
       `,
       fun: `
 🎮 *Menu Fun*
 ━━━━━━━━━━━━━━
-/jokes - Kirim lawakan random
-/meme - Kirim meme lucu
-/quote - Quote motivasi harian
+/jokes - Kirim lawakan random❌️
+/meme - Kirim meme lucu❌️
+/quote - Quote motivasi harian❌️
       `,
       admin: `
 🛠️ *Menu Admin*
 ━━━━━━━━━━━━━━
-/ban [id] - Ban user
-/unban [id] - Unban user
-/broadcast [pesan] - Kirim pesan ke semua user
+/ban [id] - Ban user❌️
+/unban [id] - Unban user❌️
+/broadcast [pesan] - Kirim pesan ke semua user❌️
       `,
       group: `
 🧩 *Menu Group*
 ━━━━━━━━━━━━━━
-/welcome - Aktifkan pesan selamat datang
-/bye - Pesan perpisahan grup
-/members - Hitung jumlah member
+/welcome - Aktifkan pesan selamat datang❌️
+/bye - Pesan perpisahan grup❌️
+/members - Hitung jumlah member❌️
       `,
       ai: `
 💬 *Menu AI*
 ━━━━━━━━━━━━━━
-/ask [pertanyaan] - Tanya AI
-/imagine [prompt] - Generate gambar AI
-/chat [teks] - Chat dengan AI
+/ask [pertanyaan] - Tanya AI❌️
+/imagine [prompt] - Generate gambar AI❌️
+/chat [teks] - Chat dengan AI❌️
       `,
       downloader: `
 📁 *Menu Downloader*
 ━━━━━━━━━━━━━━
-/ytmp4 [url] - Download video YouTube
-/ytmp3 [url] - Download musik YouTube
+/ytmp4 [url] - Download video YouTube❌️
+/ytmp3 [url] - Download musik YouTube❌️
 /tiktok [url] - Download video TikTok
-/igdl [url] - Download media Instagram
+/igdl [url] - Download media Instagram❌️
       `,
       owner: `
 🕹️ *Menu Owner*
 ━━━━━━━━━━━━━━
 /eval [kode] - Jalankan kode JS
-/restart - Restart bot
-/stat - Statistik bot
-/send [id] [pesan] - Kirim pesan manual
+/restart - Restart bot ❌️
+/stat - Statistik bot❌️
+/send [id] [pesan] - Kirim pesan manual❌️
 /addfit [nama] [kode] - Tambah fitur custom
       `,
     };
 
 // === MENU UTAMA ===
-bot.onText(/^\/menu$/, async (msg) => {
+bot.onText(/^\/start$/, async (msg) => {
   const chatId = msg.chat.id;
 
   const banner = "https://files.catbox.moe/g3zkit.jpeg";
@@ -105,6 +105,13 @@ bot.onText(/^\/menu$/, async (msg) => {
   const menuCaption = `
 📸 *MENU UTAMA* 📸
 🌸 𝓛𝓪𝓵𝓪 MD 🌸
+──────────────────────────────
+「 *`𝙱𝙾𝚃 𝙸𝙽𝙵𝙾`* 」
+  ✘ • ʙᴏᴛ ɴᴀᴍᴇ: LALA-MD 
+  ✘ • ᴏᴡɴᴇʀ ɴᴀᴍᴇ: OBINXYZ
+  ✘ • ᴠᴇʀsɪ: 1.0.1
+  ✘ • ᴛᴏᴛᴀʟ ᴜsᴇʀ: 28 ᴜsᴇʀs
+──────────────────────────────
 ──────────────────────────────
 👤 Info User  
 📜 Menu Tools  
