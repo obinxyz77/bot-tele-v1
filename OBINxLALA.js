@@ -140,7 +140,7 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
       if (bannedUsers.has(ctx.from.id)) return ctx.reply("❌ Kamu diblokir oleh admin.");
       allUsers.add(ctx.from.id);
 
-      const banner = "https://files.catbox.moe/g3zkit.jpeg";
+      const banner = ":https://files.catbox.moe/id74p9.jpg";
       const caption = `
 📸 *MENU UTAMA* 📸
 🌸 𝓛𝓪𝓵𝓪 MD 🌸
@@ -148,6 +148,10 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
 ✘ • ʙᴏᴛ ɴᴀᴍᴇ: LALA-MD
 ✘ • ᴏᴡɴᴇʀ ɴᴀᴍᴇ: OBINXYZ
 ✘ • ᴠᴇʀsɪ: 1.0.3
+──────────────────────────────
+bot masih dalam tahap pengembangan 
+maaf jika fitur bot tidak berfungsi
+──────────────────────────────
 ──────────────────────────────
 Klik tombol di bawah untuk melihat menu 👇
       `;
