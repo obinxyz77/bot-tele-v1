@@ -1,16 +1,20 @@
+
 // 🌸 Script by ObinXyz 🌸
 // Credit: @ObinXyz | Telegram: t.me/obinexyezet
-// yang ganti credit gw sumpahin scnya eror 
+// yang ganti credit gw sumpahin scnya eror 😈
 
-import TelegramBot from "node-telegram-bot-api";
+import dotenv from "dotenv";
+import readline from "readline";
+import { Telegraf, Markup } from "telegraf";
 import fetch from "node-fetch";
 import fs from "fs";
-import readline from "readline";
+
+dotenv.config();
 
 // === INPUT TOKEN & OWNER MANUAL ===
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 rl.question("Masukkan token bot Telegram kamu: ", (token) => {
@@ -25,109 +29,36 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
       process.exit(1);
     }
 
-    // Simpan config biar gak perlu input ulang
+    // Simpan config
     fs.writeFileSync("config.json", JSON.stringify({ token, ownerId }, null, 2));
 
     // === Inisialisasi Bot ===
-    const bot = new TelegramBot(token, { polling: true });
-    console.log("🤖 BOT TELE-MD AKTIF...");
+    const bot = new Telegraf(token);
+    const bannedUsers = new Set();
+    const allUsers = new Set();
+    const OPENAI_KEY = process.env.OPENAI_KEY || "";
+    const GROUP_FILE = "groupSettings.json";
+
+    // === Load Pengaturan Grup ===
+    let groupSettings = {};
+    if (fs.existsSync(GROUP_FILE)) {
+      try {
+        groupSettings = JSON.parse(fs.readFileSync(GROUP_FILE));
+      } catch {
+        groupSettings = {};
+      }
+    }
+
+    function saveGroupSettings() {
+      fs.writeFileSync(GROUP_FILE, JSON.stringify(groupSettings, null, 2));
+    }
+
+    console.log("🤖 BOT LALA-MD AKTIF...");
     console.log(`👑 Owner ID: ${ownerId}`);
 
-    // === MENU DATA ===
-    const menuList = {
-      info: `
-👤 *Menu Info User*
-━━━━━━━━━━━━━━
-/cekid - Lihat ID Telegram kamu
-/profil - Info nama & username❌️
-/waktu - Tampilkan waktu sekarang❌️
-      `,
-      tools: `
-📜 *Menu Tools*
-━━━━━━━━━━━━━━
-/shortlink [url] - Buat link pendek❌️
-/qrcode [text] - Buat QR Code❌️
-/translate [teks] - Translate bahasa❌️
-      `,
-      fun: `
-🎮 *Menu Fun*
-━━━━━━━━━━━━━━
-/jokes - Kirim lawakan random❌️
-/meme - Kirim meme lucu❌️
-/quote - Quote motivasi harian❌️
-      `,
-      admin: `
-🛠️ *Menu Admin*
-━━━━━━━━━━━━━━
-/ban [id] - Ban user❌️
-/unban [id] - Unban user❌️
-/broadcast [pesan] - Kirim pesan ke semua user❌️
-      `,
-      group: `
-🧩 *Menu Group*
-━━━━━━━━━━━━━━
-/welcome - Aktifkan pesan selamat datang❌️
-/bye - Pesan perpisahan grup❌️
-/members - Hitung jumlah member❌️
-      `,
-      ai: `
-💬 *Menu AI*
-━━━━━━━━━━━━━━
-/ask [pertanyaan] - Tanya AI❌️
-/imagine [prompt] - Generate gambar AI❌️
-/chat [teks] - Chat dengan AI❌️
-      `,
-      downloader: `
-📁 *Menu Downloader*
-━━━━━━━━━━━━━━
-/ytmp4 [url] - Download video YouTube❌️
-/ytmp3 [url] - Download musik YouTube❌️
-/tiktok [url] - Download video TikTok
-/igdl [url] - Download media Instagram❌️
-      `,
-      owner: `
-🕹️ *Menu Owner*
-━━━━━━━━━━━━━━
-/eval [kode] - Jalankan kode JS
-/restart - Restart bot ❌️
-/stat - Statistik bot❌️
-/send [id] [pesan] - Kirim pesan manual❌️
-/addfit [nama] [kode] - Tambah fitur custom
-      `,
-    };
-
-// === MENU UTAMA ===
-bot.onText(/^\/start$/, async (msg) => {
-  const chatId = msg.chat.id;
-
-  const banner = "https://files.catbox.moe/g3zkit.jpeg";
-
-  const menuCaption = `
-📸 *MENU UTAMA* 📸
-🌸 𝓛𝓪𝓵𝓪 MD 🌸
-──────────────────────────────
-「 𝙱𝙾𝚃 𝙸𝙽𝙵𝙾 」
-  ✘ • ʙᴏᴛ ɴᴀᴍᴇ: LALA-MD 
-  ✘ • ᴏᴡɴᴇʀ ɴᴀᴍᴇ: OBINXYZ
-  ✘ • ᴠᴇʀsɪ: 1.0.1
-  ✘ • ᴛᴏᴛᴀʟ ᴜsᴇʀ: 28 ᴜsᴇʀs
-──────────────────────────────
-──────────────────────────────
-👤 Info User  
-📜 Menu Tools  
-🎮 Menu Fun  
-🛠️ Menu Admin  
-🧩 Menu Group  
-💬 Menu AI  
-📁 Menu Downloader  
-🕹️ Menu Owner  
-──────────────────────────────
-Klik tombol di bawah untuk melihat isinya ⬇️
-  `;
-
-  const menuKeyboard = {
-    reply_markup: {
-      inline_keyboard: [
+    // === MENU INLINE ===
+    function mainMenuKeyboard() {
+      return Markup.inlineKeyboard([
         [
           { text: "👤 Info User", callback_data: "menu_info" },
           { text: "📜 Tools", callback_data: "menu_tools" },
@@ -144,137 +75,280 @@ Klik tombol di bawah untuk melihat isinya ⬇️
           { text: "📁 Downloader", callback_data: "menu_downloader" },
           { text: "🕹️ Owner", callback_data: "menu_owner" },
         ],
-        [
-          { text: "📋 Info Bot", callback_data: "menu_info_bot" }
-        ]
-      ],
-    },
-  };
+      ]);
+    }
 
-  await bot.sendPhoto(chatId, banner, {
-    caption: menuCaption,
-    parse_mode: "Markdown",
-    reply_markup: menuKeyboard.reply_markup,
-  });
-});
+    // === MENU TEKS ===
+    const menuList = {
+      info: `
+👤 *Menu Info User*
+━━━━━━━━━━━━━━
+/cekid - Lihat ID Telegram kamu
+      `,
+      tools: `
+📜 *Menu Tools*
+━━━━━━━━━━━━━━
+/shortlink [url] - Buat link pendek ❌️
+/qrcode [text] - Buat QR Code ❌️
+/translate [teks] - Translate bahasa ❌️
+      `,
+      fun: `
+🎮 *Menu Fun*
+━━━━━━━━━━━━━━
+/jokes - Kirim lawakan random ❌️
+/meme - Kirim meme lucu ❌️
+/quote - Quote motivasi harian ❌️
+      `,
+      admin: `
+🛠️ *Menu Admin*
+━━━━━━━━━━━━━━
+/ban [id] - Ban user
+/unban [id] - Unban user
+/broadcast [pesan] - Kirim pesan ke semua user
+      `,
+      group: `
+🧩 *Menu Group*
+━━━━━━━━━━━━━━
+/welcome - Aktifkan/Nonaktifkan pesan selamat datang
+/bye - Aktifkan/Nonaktifkan pesan perpisahan
+/members - Hitung jumlah member
+/tagall - Tag semua member
+      `,
+      ai: `
+💬 *Menu AI*
+━━━━━━━━━━━━━━
+/ask [pertanyaan] - Tanya AI
+/imagine [prompt] - Generate gambar AI ❌️
+/chat [teks] - Chat dengan AI ❌️
+      `,
+      downloader: `
+📁 *Menu Downloader*
+━━━━━━━━━━━━━━
+/tiktok [url] - Download video TikTok
+/igdl [url] - Download media Instagram
+      `,
+      owner: `
+🕹️ *Menu Owner*
+━━━━━━━━━━━━━━
+/eval [kode] - Jalankan kode JS
+/addfit [nama] [kode] - Tambah fitur custom
+      `,
+    };
 
-    // === Callback Menu ===
-    bot.on("callback_query", (query) => {
-      const chatId = query.message.chat.id;
-      const data = query.data;
+    // === START ===
+    bot.start(async (ctx) => {
+      if (bannedUsers.has(ctx.from.id)) return ctx.reply("❌ Kamu diblokir oleh admin.");
+      allUsers.add(ctx.from.id);
 
-      if (data.startsWith("menu_")) {
-        const menuName = data.split("_")[1];
-        const menuContent = menuList[menuName];
-        bot.sendMessage(chatId, menuContent || "❌ Menu tidak ditemukan.", {
-          parse_mode: "Markdown",
-        });
-      }
-      bot.answerCallbackQuery(query.id);
+      const banner = "https://files.catbox.moe/g3zkit.jpeg";
+      const caption = `
+📸 *MENU UTAMA* 📸
+🌸 𝓛𝓪𝓵𝓪 MD 🌸
+──────────────────────────────
+✘ • ʙᴏᴛ ɴᴀᴍᴇ: LALA-MD
+✘ • ᴏᴡɴᴇʀ ɴᴀᴍᴇ: OBINXYZ
+✘ • ᴠᴇʀsɪ: 1.0.3
+──────────────────────────────
+Klik tombol di bawah untuk melihat menu 👇
+      `;
+
+      await ctx.replyWithPhoto(banner, {
+        caption,
+        parse_mode: "Markdown",
+        ...mainMenuKeyboard(),
+      });
     });
 
-    // === Cek ID ===
-    bot.onText(/^\/cekid$/, (msg) => {
-      bot.sendMessage(
-        msg.chat.id,
-        `🆔 ID Kamu: \`${msg.from.id}\`\n👤 Nama: ${msg.from.first_name}`,
-        { parse_mode: "Markdown" }
+    // === CALLBACK MENU ===
+    bot.on("callback_query", async (ctx) => {
+      const data = ctx.callbackQuery.data;
+      const menuName = data.split("_")[1];
+      const menuContent = menuList[menuName];
+      await ctx.answerCbQuery();
+      await ctx.reply(menuContent || "❌ Menu tidak ditemukan.", {
+        parse_mode: "Markdown",
+      });
+    });
+
+    // === /cekid ===
+    bot.command("cekid", (ctx) => {
+      ctx.reply(`🆔 ID Kamu: \`${ctx.from.id}\`\n👤 Nama: ${ctx.from.first_name}`, {
+        parse_mode: "Markdown",
+      });
+    });
+
+    // === ADMIN COMMANDS ===
+    bot.hears(/^\/ban (.+)/, (ctx) => {
+      if (ctx.from.id.toString() !== ownerId) return;
+      const id = ctx.match[1].trim();
+      bannedUsers.add(Number(id));
+      ctx.reply(`🚫 User ${id} telah dibanned.`);
+    });
+
+    bot.hears(/^\/unban (.+)/, (ctx) => {
+      if (ctx.from.id.toString() !== ownerId) return;
+      const id = ctx.match[1].trim();
+      bannedUsers.delete(Number(id));
+      ctx.reply(`✅ User ${id} telah diunban.`);
+    });
+
+    bot.hears(/^\/broadcast (.+)/, async (ctx) => {
+      if (ctx.from.id.toString() !== ownerId) return;
+      const msg = ctx.match[1];
+      let count = 0;
+      for (const id of allUsers) {
+        if (!bannedUsers.has(id)) {
+          try {
+            await bot.telegram.sendMessage(id, `📢 Pesan Admin:\n${msg}`);
+            count++;
+          } catch {}
+        }
+      }
+      ctx.reply(`📨 Pesan terkirim ke ${count} user.`);
+    });
+
+    // === GROUP COMMANDS ===
+    bot.command("welcome", (ctx) => {
+      if (ctx.chat.type === "private") return ctx.reply("❌ Perintah ini hanya untuk grup.");
+      const gid = ctx.chat.id;
+      groupSettings[gid] = groupSettings[gid] || { welcome: false, bye: false };
+      groupSettings[gid].welcome = !groupSettings[gid].welcome;
+      saveGroupSettings();
+      ctx.reply(
+        groupSettings[gid].welcome
+          ? "✅ Pesan selamat datang diaktifkan."
+          : "❌ Pesan selamat datang dimatikan."
       );
     });
 
-    // === Tambah Fitur Dinamis ===
-    bot.onText(/^\/addfit (.+)/, (msg, match) => {
-  if (msg.from.id.toString() !== ownerId.toString()) {
-    return bot.sendMessage(msg.chat.id, "❌ Kamu bukan owner!");
-  }
+    bot.command("bye", (ctx) => {
+      if (ctx.chat.type === "private") return ctx.reply("❌ Perintah ini hanya untuk grup.");
+      const gid = ctx.chat.id;
+      groupSettings[gid] = groupSettings[gid] || { welcome: false, bye: false };
+      groupSettings[gid].bye = !groupSettings[gid].bye;
+      saveGroupSettings();
+      ctx.reply(
+        groupSettings[gid].bye
+          ? "✅ Pesan perpisahan diaktifkan."
+          : "❌ Pesan perpisahan dimatikan."
+      );
+    });
 
-  const args = match[1].trim().split(" ");
-  const nama = args.shift();
-  const kode = args.join(" ");
+    bot.command("members", async (ctx) => {
+      if (ctx.chat.type === "private") return ctx.reply("❌ Perintah ini hanya untuk grup.");
+      const members = await ctx.getChatMembersCount();
+      ctx.reply(`👥 Jumlah member saat ini: *${members}*`, { parse_mode: "Markdown" });
+    });
 
-  if (!nama || !kode) {
-    return bot.sendMessage(msg.chat.id, "❌ Format: /addfit [nama] [kode JS]");
-  }
-
-  try {
-    // Escape karakter khusus biar aman di regex
-    const safeName = nama.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-    // Buat regex command secara dinamis
-    const regex = new RegExp(`^${safeName}$`, "i");
-
-    // Pasang handler baru
-    bot.onText(regex, async (msg) => {
+    // === /tagall ===
+    bot.command("tagall", async (ctx) => {
+      if (ctx.chat.type === "private") return ctx.reply("❌ Hanya untuk grup.");
+      const sender = ctx.from.first_name;
+      const text = ctx.message.text.split(" ").slice(1).join(" ") || "📢 Panggilan untuk semua member!";
       try {
-        eval(kode);
-      } catch (e) {
-        bot.sendMessage(msg.chat.id, `❌ Error di kode fitur: ${e.message}`);
+        const admins = await ctx.getChatAdministrators();
+        const isAdmin = admins.some((a) => a.user.id === ctx.from.id);
+        if (!isAdmin) return ctx.reply("❌ Hanya admin yang bisa menggunakan perintah ini.");
+
+        const members = await ctx.getChatMembersCount();
+        let mentions = "";
+        for (let i = 0; i < Math.min(members, 50); i++) {
+          mentions += `[👤](tg://user?id=${ctx.from.id}) `;
+        }
+        ctx.reply(`${text}\n\n${mentions}`, { parse_mode: "Markdown" });
+      } catch (err) {
+        console.error(err);
+        ctx.reply("⚠️ Gagal men-tag semua member.");
       }
     });
 
-    bot.sendMessage(
-      msg.chat.id,
-      `✅ Fitur baru '${nama}' berhasil ditambahkan!\n\nGunakan perintah: ${nama}`
-    );
-  } catch (err) {
-    bot.sendMessage(msg.chat.id, `❌ Gagal menambah fitur: ${err.message}`);
-  }
-});
+    // === EVENT: NEW MEMBER / LEAVE ===
+    bot.on("new_chat_members", (ctx) => {
+      const gid = ctx.chat.id;
+      if (groupSettings[gid]?.welcome) {
+        ctx.message.new_chat_members.forEach((member) =>
+          ctx.reply(`🎉 Selamat datang, ${member.first_name}!`)
+        );
+      }
+    });
 
-    // === TikTok Downloader ===
-    bot.onText(/^\/tiktok (.+)/, async (msg, match) => {
-      const chatId = msg.chat.id;
-      const url = match[1];
-      bot.sendMessage(chatId, "📥 Mengambil video TikTok...");
+    bot.on("left_chat_member", (ctx) => {
+      const gid = ctx.chat.id;
+      if (groupSettings[gid]?.bye) {
+        ctx.reply(`😢 Selamat tinggal, ${ctx.message.left_chat_member.first_name}!`);
+      }
+    });
+
+    // === AI FEATURE ===
+    bot.hears(/^\/ask (.+)/, async (ctx) => {
+      const question = ctx.match[1];
+      if (!OPENAI_KEY) return ctx.reply("❌ OPENAI_KEY belum diset di .env");
+      ctx.reply("⏳ Sedang memproses...");
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENAI_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: "Kamu adalah asisten ramah bernama Lala." },
+              { role: "user", content: question },
+            ],
+          }),
+        });
+
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || "❌ Tidak ada jawaban.";
+        ctx.reply(reply);
+      } catch {
+        ctx.reply("❌ Gagal memanggil AI.");
+      }
+    });
+
+    // === DOWNLOADER ===
+    bot.hears(/^\/tiktok (.+)/, async (ctx) => {
+      const url = ctx.match[1];
+      await ctx.reply("📥 Mengambil video TikTok...");
       try {
         const api = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
         const res = await fetch(api);
         const j = await res.json();
         if (j?.data?.play) {
-          await bot.sendVideo(chatId, j.data.play, { caption: `🎬 ${j.data.title}` });
-        } else throw new Error("Data tidak valid");
+          await ctx.replyWithVideo({ url: j.data.play }, { caption: `🎬 ${j.data.title}` });
+        } else throw new Error();
       } catch {
-        bot.sendMessage(chatId, "❌ Gagal mengambil video TikTok.");
+        ctx.reply("❌ Gagal mengambil video TikTok.");
       }
     });
 
-    // === IG Downloader ===
-    bot.onText(/^\/igdl (.+)/, async (msg, match) => {
-      const chatId = msg.chat.id;
-      const url = match[1];
-      bot.sendMessage(chatId, "📥 Mengambil media Instagram...");
+    bot.hears(/^\/igdl (.+)/, async (ctx) => {
+      const url = ctx.match[1];
+      await ctx.reply("📥 Mengambil media Instagram...");
       try {
         const api = `https://api.sssinstagram.com/api/ig?url=${encodeURIComponent(url)}`;
         const res = await fetch(api);
         const j = await res.json();
         if (j?.links?.length) {
-          for (const media of j.links)
-            await bot.sendVideo(chatId, media.url, { caption: "🎬 Media Instagram" });
-        } else throw new Error("Tidak ada media");
+          for (const media of j.links) {
+            await ctx.replyWithVideo({ url: media.url }, { caption: "🎬 Media Instagram" });
+          }
+        } else throw new Error();
       } catch {
-        bot.sendMessage(chatId, "❌ Gagal mengambil media Instagram.");
+        ctx.reply("❌ Gagal mengambil media Instagram.");
       }
     });
 
-    // === Sticker Maker ===
-    bot.on("photo", async (msg) => {
-      const chatId = msg.chat.id;
-      const fileId = msg.photo.pop().file_id;
-      const fileLink = await bot.getFileLink(fileId);
-      const res = await fetch(fileLink);
-      const buffer = Buffer.from(await res.arrayBuffer());
-      fs.writeFileSync("temp.jpg", buffer);
-      await bot.sendSticker(chatId, "temp.jpg");
-      fs.unlinkSync("temp.jpg");
+    // === AUTO GREET ===
+    bot.hears(/^(halo|hai|hi)$/i, (ctx) => {
+      ctx.reply(`Halo ${ctx.from.first_name}! 👋\nKetik /menu untuk lihat fitur.`);
     });
 
-    // === Respon sederhana ===
-    bot.on("message", (msg) => {
-      const text = msg.text?.toLowerCase();
-      if (!text) return;
-      if (["halo", "hai", "hi"].includes(text)) {
-        bot.sendMessage(msg.chat.id, `Halo ${msg.from.first_name}! 👋\nKetik /menu untuk lihat fitur.`);
-      }
-    });
+    // === LAUNCH BOT ===
+    bot.launch().then(() => console.log("🤖 BOT LALA-MD AKTIF!"));
+    process.once("SIGINT", () => bot.stop("SIGINT"));
+    process.once("SIGTERM", () => bot.stop("SIGTERM"));
   });
 });
