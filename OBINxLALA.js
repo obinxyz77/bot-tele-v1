@@ -140,7 +140,7 @@ rl.question("Masukkan token bot Telegram kamu: ", (token) => {
       if (bannedUsers.has(ctx.from.id)) return ctx.reply("❌ Kamu diblokir oleh admin.");
       allUsers.add(ctx.from.id);
 
-      const banner = ":https://files.catbox.moe/id74p9.jpg";
+      const banner = "https://files.catbox.moe/id74p9.jpg";
       const caption = `
 📸 *MENU UTAMA* 📸
 🌸 𝓛𝓪𝓵𝓪 MD 🌸
