@@ -31,8 +31,8 @@ Klik tombol di bawah untuk menyalin perintah:
 
 Atau bisa langsung ketik manual di terminal:
 ```bash
-$git clone https://github.com/obinxyz77/bot-tele-v1.git
-$cd bot-tele-v1
+git clone https://github.com/obinxyz77/bot-tele-v1.git
+cd bot-tele-v1
 ```
  ##2 jalanin scnya
  
@@ -42,6 +42,6 @@ $cd bot-tele-v1
 
  bisa juga langsnung di terminal:
  ```
- $npm install
- $npm start
+ npm install
+ npm start
 ```
