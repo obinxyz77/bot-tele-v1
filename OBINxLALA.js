@@ -313,37 +313,47 @@ Klik tombol di bawah untuk melihat menu 👇
     });
 
     // === DOWNLOADER ===
-    bot.hears(/^\/tiktok (.+)/, async (ctx) => {
-      const url = ctx.match[1];
-      await ctx.reply("📥 Mengambil video TikTok...");
-      try {
-        const api = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
-        const res = await fetch(api);
-        const j = await res.json();
-        if (j?.data?.play) {
-          await ctx.replyWithVideo({ url: j.data.play }, { caption: `🎬 ${j.data.title}` });
-        } else throw new Error();
-      } catch {
-        ctx.reply("❌ Gagal mengambil video TikTok.");
-      }
-    });
+    // === AUTO DOWNLOADER ===
 
-    bot.hears(/^\/igdl (.+)/, async (ctx) => {
-      const url = ctx.match[1];
-      await ctx.reply("📥 Mengambil media Instagram...");
-      try {
-        const api = `https://api.sssinstagram.com/api/ig?url=${encodeURIComponent(url)}`;
-        const res = await fetch(api);
-        const j = await res.json();
-        if (j?.links?.length) {
-          for (const media of j.links) {
-            await ctx.replyWithVideo({ url: media.url }, { caption: "🎬 Media Instagram" });
-          }
-        } else throw new Error();
-      } catch {
-        ctx.reply("❌ Gagal mengambil media Instagram.");
+// TikTok auto-detect
+bot.hears(/https?:\/\/(www\.)?(tiktok\.com|vt\.tiktok\.com)\/\S+/, async (ctx) => {
+  const url = ctx.message.text.match(/https?:\/\/\S+/)[0];
+  await ctx.reply("📥 Mengambil video TikTok...");
+  try {
+    const api = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+    const res = await fetch(api);
+    const j = await res.json();
+    if (j?.data?.play) {
+      await ctx.replyWithVideo({ url: j.data.play }, { caption: `🎬 ${j.data.title}` });
+    } else throw new Error();
+  } catch (e) {
+    console.error(e);
+    ctx.reply("❌ Gagal mengambil video TikTok.");
+  }
+});
+
+// Instagram auto-detect
+bot.hears(/https?:\/\/(www\.)?(instagram\.com|reel\.instagram\.com|www\.threads\.net)\/\S+/, async (ctx) => {
+  const url = ctx.message.text.match(/https?:\/\/\S+/)[0];
+  await ctx.reply("📥 Mengambil media Instagram...");
+  try {
+    const api = `https://api.sssinstagram.com/api/ig?url=${encodeURIComponent(url)}`;
+    const res = await fetch(api);
+    const j = await res.json();
+    if (j?.links?.length) {
+      for (const media of j.links) {
+        if (media.url.endsWith('.mp4')) {
+          await ctx.replyWithVideo({ url: media.url }, { caption: "🎬 Media Instagram" });
+        } else {
+          await ctx.replyWithPhoto({ url: media.url }, { caption: "📸 Foto Instagram" });
+        }
       }
-    });
+    } else throw new Error();
+  } catch (e) {
+    console.error(e);
+    ctx.reply("❌ Gagal mengambil media Instagram.");
+  }
+});
 
     // === AUTO GREET ===
     bot.hears(/^(halo|hai|hi)$/i, (ctx) => {
