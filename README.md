@@ -30,9 +30,10 @@ Klik tombol di bawah untuk menyalin perintah:
 </a>
 
 Atau bisa langsung ketik manual di terminal:
-git clone https://github.com/obinxyz77/bot-tele-v1.git
-cd bot-tele-v1
-
+```bash
+$git clone https://github.com/obinxyz77/bot-tele-v1.git
+$cd bot-tele-v1
+```
  ##2 jalanin scnya
  
  <a href="#" onclick="navigator.clipboard.writeText('npm start'); alert('✅ berhasil disalin!');" style="text-decoration:none;">
@@ -40,7 +41,7 @@ cd bot-tele-v1
 </a>
 
  bisa juga langsnung di terminal:
- 
- npm install
- 
- npm start
+ ```
+ $npm install
+ $npm start
+```
