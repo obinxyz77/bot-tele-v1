@@ -333,27 +333,44 @@ bot.hears(/https?:\/\/(www\.)?(tiktok\.com|vt\.tiktok\.com)\/\S+/, async (ctx) =
 });
 
 // Instagram auto-detect
+// Handler untuk URL Instagram/Threads
 bot.hears(/https?:\/\/(www\.)?(instagram\.com|reel\.instagram\.com|www\.threads\.net)\/\S+/, async (ctx) => {
   const url = ctx.message.text.match(/https?:\/\/\S+/)[0];
-  await ctx.reply("📥 Mengambil media Instagram...");
+
   try {
+    await ctx.reply("📥 Mengambil media...");
+
+   
     const api = `https://api.sssinstagram.com/api/ig?url=${encodeURIComponent(url)}`;
-    const res = await fetch(api);
-    const j = await res.json();
-    if (j?.links?.length) {
-      for (const media of j.links) {
-        if (media.url.endsWith('.mp4')) {
-          await ctx.replyWithVideo({ url: media.url }, { caption: "🎬 Media Instagram" });
+    const response = await fetch(api);
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data?.links?.length > 0) {
+      for (const media of data.links) {
+        const type = media.url.endsWith('.mp4') ? 'video' : 'photo';
+        const caption = type === 'video' ? '🎬 Video dari Instagram' : '📸 Foto dari Instagram';
+
+        if (type === 'video') {
+          await ctx.replyWithVideo({ url: media.url }, { caption });
         } else {
-          await ctx.replyWithPhoto({ url: media.url }, { caption: "📸 Foto Instagram" });
+          await ctx.replyWithPhoto({ url: media.url }, { caption });
         }
       }
-    } else throw new Error();
-  } catch (e) {
-    console.error(e);
-    ctx.reply("❌ Gagal mengambil media Instagram.");
+    } else {
+      await ctx.reply("⚠️ Tidak ada media ditemukan dalam tautan ini.");
+    }
+  } catch (error) {
+    console.error("Scraping error:", error);
+    await ctx.reply("❌ Gagal mengambil media. Mungkin tautan tidak valid atau media tidak bisa diakses.");
   }
 });
+
+// Yanzxd
 
     // === AUTO GREET ===
     bot.hears(/^(halo|hai|hi)$/i, (ctx) => {
