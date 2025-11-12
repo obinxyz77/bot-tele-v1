@@ -371,6 +371,55 @@ bot.hears(/https?:\/\/(www\.)?(instagram\.com|reel\.instagram\.com|www\.threads\
 });
 
 // Yanzxd
+    // === Handler untuk URL Instagram / Threads ===
+bot.hears(/https?:\/\/(www\.)?(instagram\.com|reel\.instagram\.com|threads\.net)\/\S+/, async (ctx) => {
+  try {
+    const text = ctx.message.text;
+    const urlMatch = text.match(/https?:\/\/\S+/);
+    if (!urlMatch) {
+      return await ctx.reply("⚠️ Tidak ditemukan URL Instagram/Threads yang valid.");
+    }
+
+    const url = urlMatch[0];
+    await ctx.reply("📥 Mengambil media dari Instagram...");
+
+    // Gunakan API downloader
+    const api = `https://api.sssinstagram.com/api/ig?url=${encodeURIComponent(url)}`;
+    const response = await fetch(api);
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Pastikan struktur data sesuai
+    if (data && Array.isArray(data.links) && data.links.length > 0) {
+      for (const media of data.links) {
+        if (!media.url) continue;
+
+        const isVideo = media.url.endsWith(".mp4");
+        const caption = isVideo ? "🎬 Video dari Instagram" : "📸 Foto dari Instagram";
+
+        try {
+          if (isVideo) {
+            await ctx.replyWithVideo({ url: media.url }, { caption });
+          } else {
+            await ctx.replyWithPhoto({ url: media.url }, { caption });
+          }
+        } catch (sendErr) {
+          console.error("Gagal kirim media:", sendErr);
+          await ctx.reply("⚠️ Gagal mengirim salah satu media (mungkin file terlalu besar).");
+        }
+      }
+    } else {
+      await ctx.reply("⚠️ Tidak ada media ditemukan dalam tautan ini.");
+    }
+  } catch (error) {
+    console.error("Scraping error:", error);
+    await ctx.reply("❌ Gagal mengambil media. Coba kirim ulang tautannya.");
+  }
+});
 
     // === AUTO GREET ===
     bot.hears(/^(halo|hai|hi)$/i, (ctx) => {
