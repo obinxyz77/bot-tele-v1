@@ -43,5 +43,7 @@ cd bot-tele-v1
  bisa juga langsnung di terminal:
  ```
  npm install
+ npm install dotenv
+ npm install telegraf
  npm start
 ```
