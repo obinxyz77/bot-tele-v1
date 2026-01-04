@@ -53,3 +53,8 @@ Atau ketik manual di terminal:
 ```bash
 git clone https://github.com/obinxyz77/bot-tele-v1.git
 cd bot-tele-v1
+npm install telegraf
+npm install dotenv
+npm install qrcode
+npm install
+npm start
